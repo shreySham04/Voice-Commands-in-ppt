@@ -2,15 +2,14 @@ import speech_recognition as sr
 import pyautogui
 import pygetwindow as gw
 import time
+import re
 
 def focus_powerpoint():
-    # Find PowerPoint window
     windows = [w for w in gw.getWindowsWithTitle('PowerPoint') if w.visible]
-
     if windows:
         ppt_window = windows[0]
         ppt_window.activate()
-        time.sleep(0.3)  # Small delay to ensure it gets focus
+        time.sleep(0.3)
         return True
     return False
 
@@ -18,7 +17,8 @@ def voice_control():
     recognizer = sr.Recognizer()
     mic = sr.Microphone()
 
-    print("🎤 Voice control started. Say 'next' or 'previous'...")
+    print("🎤 Voice control started. Available commands: next, previous, start slideshow, resume slideshow, end slideshow, go to slide X, blank screen, show slide, close PowerPoint.")
+    
     while True:
         with mic as source:
             recognizer.adjust_for_ambient_noise(source)
@@ -37,9 +37,28 @@ def voice_control():
                 pyautogui.press("right")
             elif "previous" in command or "back" in command:
                 pyautogui.press("left")
-            elif "exit" in command or "stop" in command:
+            elif "start slideshow" in command:
+                pyautogui.press("f5")
+            elif "resume slideshow" in command:
+                pyautogui.hotkey("shift", "f5")
+            elif "end slideshow" in command or "stop slideshow" in command:
+                pyautogui.press("esc")
+            elif "go to slide" in command:
+                match = re.search(r"go to slide (\d+)", command)
+                if match:
+                    slide_number = match.group(1)
+                    pyautogui.typewrite(slide_number)
+                    pyautogui.press("enter")
+            elif "blank screen" in command:
+                pyautogui.press("b")
+            elif "show slide" in command:
+                pyautogui.press("b")
+            elif "close powerpoint" in command:
+                pyautogui.hotkey("alt", "f4")
+            elif "exit" in command or "quit" in command:
                 print("🛑 Stopping voice control.")
                 break
+
         except sr.UnknownValueError:
             print("Didn't catch that. Try again.")
         except sr.RequestError:
