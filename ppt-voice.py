@@ -1,15 +1,17 @@
+#Importing Libraries 
 import speech_recognition as sr
 import pyautogui
 import pygetwindow as gw
 import time
 import re
 
+
 def focus_powerpoint():
-    windows = [w for w in gw.getWindowsWithTitle('PowerPoint') if w.visible]
+    windows = [w for w in gw.getWindowsWithTitle('PowerPoint') if w.visible] #Command helps making the script able to only react with ppt and not other applications, this stops any distraction for the script
     if windows:
         ppt_window = windows[0]
         ppt_window.activate()
-        time.sleep(0.3)
+        time.sleep(0.3) #Note- open only one ppt at a time and un script in bg
         return True
     return False
 
@@ -41,7 +43,7 @@ def voice_control():
                 pyautogui.press("f5")
             elif "resume slideshow" in command:
                 pyautogui.hotkey("shift", "f5")
-            elif "end slideshow" in command or "stop slideshow" in command:
+            elif "end slideshow" in command or "stop slideshow" in command:  #In many case it will take "and" as input instead of "end" so use and instead.
                 pyautogui.press("esc")
             elif "go to slide" in command:
                 match = re.search(r"go to slide (\d+)", command)
@@ -66,3 +68,4 @@ def voice_control():
 
 if __name__ == "__main__":
     voice_control()
+
